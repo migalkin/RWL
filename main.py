@@ -9,6 +9,7 @@ from models.encoders import CompGCN, RGCN
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--dataset", type=str, choices=["AIFB", "AM"])
+parser.add_argument("--use_valid", action="store_true")     # optional validation set
 parser.add_argument("--compgcn", action="store_true")       # use CompGCN or R-GCN
 parser.add_argument("--wandb", action="store_true")         # use wandb for tracking
 parser.add_argument("--lr", type=float, default=0.0003)     # learning rate
@@ -42,6 +43,17 @@ def main():
     # initialization of node features to the same one-hot vector
     data.x = torch.zeros((data.num_nodes, args.dim))
     data.x[:, 0] = 1.0
+
+    if args.use_valid:
+        # use 10% of train as validation
+        train_idx = data.train_idx
+        train_y = data.train_y
+        train_size = len(train_idx)
+        perm = torch.randperm(train_size)
+        data.train_idx = train_idx[perm[:int(0.9*train_size)]]
+        data.valid_idx = train_idx[perm[int(0.9*train_size):]]
+        data.train_y = train_y[perm[:int(0.9*train_size)]]
+        data.valid_y = train_y[perm[int(0.9*train_size):]]
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     device = torch.device("cpu") if args.dataset == "AM" else device
@@ -97,8 +109,9 @@ def main():
         out = model(data.x, data.edge_index, data.edge_type)
         pred = out.argmax(dim=-1)
         train_acc = pred[data.train_idx].eq(data.train_y).to(torch.float).mean()
+        valid_acc = pred[data.valid_idx].eq(data.valid_y).to(torch.float).mean().item() if args.use_valid else 0.0
         test_acc = pred[data.test_idx].eq(data.test_y).to(torch.float).mean()
-        return train_acc.item(), test_acc.item()
+        return train_acc.item(), test_acc.item(), valid_acc
 
     max_train, max_test = 0.0, 0.0
 
@@ -108,11 +121,11 @@ def main():
 
     for epoch in range(1, args.epochs):
         loss = train()
-        train_acc, test_acc = test()
+        train_acc, test_acc, valid_acc = test()
         max_train = max(max_train, train_acc)
         max_test = max(max_test, test_acc)
         print(
-            f"Epoch: {epoch:02d}, Loss: {loss:.4f}, Train: {train_acc:.4f} "
+            f"Epoch: {epoch:02d}, Loss: {loss:.4f}, Train: {train_acc:.4f} Valid: {valid_acc:.4f} "
             f"Test: {test_acc:.4f}"
         )
         if args.wandb:
