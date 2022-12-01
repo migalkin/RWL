@@ -9,12 +9,12 @@ This is the official code base of the paper
 
 [Weisfeiler and Leman Go Relational][paper]
 
-[Pablo Barcelo](https://pbarcelo.ing.uc.cl/)
+[Pablo Barcelo](https://pbarcelo.ing.uc.cl/),
 [Mikhail Galkin](https://migalkin.github.io),
-[Christopher Morris](https://chrsmrrs.github.io/)
+[Christopher Morris](https://chrsmrrs.github.io/),
 [Miguel Romero Orth](http://mromero.cl/)
 
-[paper]: https://openreview.net/pdf?id=wY_IYhh6pqj
+[paper]: https://openreview.net/forum?id=wY_IYhh6pqj
 
 ## Overview ##
 
