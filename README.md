@@ -2,7 +2,7 @@
 
 <p align="center">
 <a href="https://openreview.net/pdf?id=wY_IYhh6pqj"><img src="http://img.shields.io/badge/OpenReview-PDF-red.svg" alt="LOG paper"></a>
-<a href="arxiv TODO"><img src="http://img.shields.io/badge/arxiv-abs-red.svg" alt="arxiv"></a>
+<a href="https://arxiv.org/abs/2211.17113"><img src="http://img.shields.io/badge/arxiv-abs-red.svg" alt="arxiv"></a>
 </p>
 
 This is the official code base of the paper
